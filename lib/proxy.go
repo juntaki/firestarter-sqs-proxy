@@ -39,7 +39,7 @@ func (s *SQSProxy) Run() error {
 			errorCount++
 		}
 		if errorCount > 10 {
-			return nil
+			return err
 		}
 	}
 }
@@ -49,7 +49,7 @@ func (s *SQSProxy) getMessage() error {
 	params := &sqs.ReceiveMessageInput{
 		QueueUrl:            aws.String(s.url),
 		MaxNumberOfMessages: aws.Int64(10),
-		WaitTimeSeconds:     aws.Int64(300),
+		WaitTimeSeconds:     aws.Int64(20),
 	}
 	resp, err := s.svc.ReceiveMessage(params)
 	if err != nil {
@@ -96,9 +96,12 @@ func (s *SQSProxy) DeleteMessage(msg *sqs.Message) error {
 }
 
 func (s *SQSProxy) HttpPost(value string) error {
-	fmt.Println("Send ", value)
-	values := url.Values{}
+	if len(value) < 8 {
+		log.Println("Invalid message")
+		return nil
+	}
 
+	values := url.Values{}
 	buf, err := url.QueryUnescape(value[8:])
 	if err != nil {
 		return err

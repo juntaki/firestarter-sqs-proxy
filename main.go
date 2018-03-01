@@ -13,8 +13,8 @@ func main() {
 	target := os.Getenv("POST_URL")
 	proxy, err := lib.NewSQSProxy(url, target)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to make SQS proxy", err)
 	}
 	err = proxy.Run() // should not return
-	log.Fatal(err)
+	log.Fatal("Failed", err)
 }
